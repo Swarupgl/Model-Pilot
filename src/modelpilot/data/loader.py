@@ -23,10 +23,8 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Public type alias — a dict describing a loaded dataset.
 # Keys are documented here so callers know what to expect.
-# ──────────────────────────────────────────────────────────────────────────────
 LoadedDataset = dict  # See load_csv / load_builtin for the guaranteed keys.
 
 
@@ -131,9 +129,7 @@ def load_builtin(name: str, target_column: Optional[str] = None) -> LoadedDatase
     )
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Internal helpers
-# ──────────────────────────────────────────────────────────────────────────────
 
 def _validate_and_package(
     df: pd.DataFrame,
@@ -145,7 +141,7 @@ def _validate_and_package(
     """
     warnings: list[str] = []
 
-    # ── Basic structural checks ───────────────────────────────────────────────
+# Basic structural checks
     if df.empty:
         raise ValueError("Dataset is empty (0 rows after loading).")
 
@@ -155,7 +151,7 @@ def _validate_and_package(
             "Need at least one feature and one target."
         )
 
-    # ── Resolve target column ─────────────────────────────────────────────────
+# Resolve target column
     if target_column is None:
         target_column = df.columns[-1]
         warnings.append(
@@ -171,12 +167,12 @@ def _validate_and_package(
     X = df.drop(columns=[target_column])
     y = df[target_column]
 
-    # ── Detect task type ──────────────────────────────────────────────────────
+# Detect task type
     task_type, task_warning = _detect_task_type(y, target_column)
     if task_warning:
         warnings.append(task_warning)
 
-    # ── Soft warnings ─────────────────────────────────────────────────────────
+# Soft warnings
     if df.isnull().values.any():
         missing_count = df.isnull().sum().sum()
         warnings.append(
@@ -272,9 +268,7 @@ def _log_summary(ds: LoadedDataset) -> None:
         logger.warning("  [LOADER WARNING] %s", w)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Built-in dataset helpers — convert sklearn Bunch → DataFrame
-# ──────────────────────────────────────────────────────────────────────────────
 
 def _load_iris() -> tuple[pd.DataFrame, str]:
     from sklearn.datasets import load_iris

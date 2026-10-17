@@ -35,9 +35,7 @@ def _unique_experiment_id() -> str:
 logger = logging.getLogger(__name__)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Public API
-# ──────────────────────────────────────────────────────────────────────────────
 
 def save_experiment(
     dataset_source: str,
@@ -75,14 +73,14 @@ def save_experiment(
     experiment_id = _unique_experiment_id()
     timestamp = datetime.now(tz=timezone.utc).isoformat()
 
-    # ── Derive a safe filename ────────────────────────────────────────────────
+# Derive a safe filename
     dataset_slug = dataset_source.replace(":", "_").replace("/", "_").replace("\\", "_")
     ts_compact = datetime.now().strftime("%Y%m%d_%H%M%S")
     short_id = experiment_id[:8]
     filename = f"{ts_compact}_{short_id}_{dataset_slug}.json"
     file_path = output_dir / filename
 
-    # ── Build the experiment record ───────────────────────────────────────────
+# Build the experiment record
     record = {
         "experiment_id": experiment_id,
         "timestamp_utc": timestamp,
@@ -129,9 +127,7 @@ def list_experiments(output_dir: str | Path = "outputs/experiments") -> list[Pat
     return sorted(output_dir.glob("*.json"))
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Internal helpers
-# ──────────────────────────────────────────────────────────────────────────────
 
 def _find_best(results: list[dict]) -> Optional[dict]:
     """Return the best successful result by primary_score."""

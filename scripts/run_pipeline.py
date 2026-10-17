@@ -30,7 +30,7 @@ import logging
 import sys
 from pathlib import Path
 
-# ── Ensure src/ is on the import path when running as a script ────────────────
+# Ensure src/ is on the import path when running as a script
 # This is only needed when running directly; when installed as a package
 # (via pip install -e .) the src/ layout is handled by pyproject.toml.
 _project_root = Path(__file__).resolve().parent.parent
@@ -44,9 +44,7 @@ from modelpilot.evaluation.model_evaluator import (
 )
 from modelpilot.experiments.result_store import save_experiment
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Logging setup
-# ──────────────────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(name)s — %(message)s",
@@ -55,9 +53,7 @@ logging.basicConfig(
 logger = logging.getLogger("modelpilot.pipeline")
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Main pipeline function
-# ──────────────────────────────────────────────────────────────────────────────
 
 def run_pipeline(
     dataset_name: str | None = "iris",
@@ -72,9 +68,9 @@ def run_pipeline(
 
     Returns the experiment record dict so tests can assert on it.
     """
-    separator = "─" * 60
+separator = "─" * 60
 
-    # ── Step 1: Load data ────────────────────────────────────────────────────
+# Step 1: Load data
     print(f"\n{separator}")
     print(" ModelPilot — Phase 1 Pipeline")
     print(separator)
@@ -97,7 +93,7 @@ def run_pipeline(
         for w in dataset["warnings"]:
             print(f"   • {w}")
 
-    # ── Step 2: Get candidate algorithms ─────────────────────────────────────
+# Step 2: Get candidate algorithms
     print(f"\n{separator}")
     all_algorithms = get_available_algorithms(
         task_type=dataset["task_type"],
@@ -117,7 +113,7 @@ def run_pipeline(
         marker = "  [baseline]" if i == 0 else ""
         print(f"   {i+1}. {name}{marker}")
 
-    # ── Step 3: Evaluate candidates ───────────────────────────────────────────
+# Step 3: Evaluate candidates
     print(f"\n{separator}")
     print(f"\n⚙️  Running {cv_folds}-fold cross-validation (seed={random_seed}) ...")
     print()
@@ -132,7 +128,7 @@ def run_pipeline(
         algorithms_config_path=_project_root / "configs" / "algorithms.yaml",
     )
 
-    # ── Step 4: Print results table ───────────────────────────────────────────
+# Step 4: Print results table
     print(f"\n{separator}")
     print("\n📊 Results (sorted by primary metric, best first):\n")
 
@@ -155,7 +151,7 @@ def run_pipeline(
 
         print(f"  {rank:<5} {r['algorithm']:<30} {score_str:<22} {std_str:<10} {time_str:<10} {status_str}")
 
-    # ── Step 5: Show secondary metrics for best model ─────────────────────────
+# Step 5: Show secondary metrics for best model
     best = next((r for r in results if r["status"] == "ok"), None)
     if best and best["secondary_metrics"]:
         print(f"\n🏆 Best model: {best['algorithm']}")
@@ -163,7 +159,7 @@ def run_pipeline(
         for k, v in best["secondary_metrics"].items():
             print(f"   • {k}: {v:.4f}")
 
-    # ── Step 6: Save results ──────────────────────────────────────────────────
+# Step 6: Save results
     print(f"\n{separator}")
     config_used = {
         "cv_folds": cv_folds,
@@ -189,9 +185,7 @@ def run_pipeline(
     }
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # CLI argument parsing
-# ──────────────────────────────────────────────────────────────────────────────
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(

@@ -48,9 +48,7 @@ logger = logging.getLogger(__name__)
 EvaluationResult = dict
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Public API
-# ──────────────────────────────────────────────────────────────────────────────
 
 def evaluate_candidate(
     algorithm_name: str,
@@ -122,7 +120,7 @@ def evaluate_candidate(
     }
 
     try:
-        # ── 1. Load algorithm definition ──────────────────────────────────────
+# 1. Load algorithm definition
         algo_def = _load_algorithm_definition(
             algorithm_name, task_type, algorithms_config_path
         )
@@ -131,23 +129,23 @@ def evaluate_candidate(
             params.update(algorithm_params)
         result["params_used"] = params
 
-        # ── 2. Instantiate the estimator ──────────────────────────────────────
+# 2. Instantiate the estimator
         estimator = _instantiate_estimator(algo_def, params, random_seed)
 
-        # ── 3. Build preprocessing + model pipeline ───────────────────────────
+# 3. Build preprocessing + model pipeline
         pipeline = _build_pipeline(X, estimator)
 
-        # ── 4. Encode target for classification ───────────────────────────────
+# 4. Encode target for classification
         y_encoded, label_encoder = _encode_target(y, task_type)
 
-        # ── 5. Choose CV strategy ─────────────────────────────────────────────
+# 5. Choose CV strategy
         cv = _make_cv(task_type, cv_folds, random_seed, y_encoded)
 
-        # ── 6. Choose scoring metrics ─────────────────────────────────────────
+# 6. Choose scoring metrics
         primary_metric, scoring_dict = _get_scoring(task_type)
         result["primary_metric"] = primary_metric
 
-        # ── 7. Run cross-validation ───────────────────────────────────────────
+# 7. Run cross-validation
         start = time.perf_counter()
         cv_results = cross_validate(
             pipeline,
@@ -161,7 +159,7 @@ def evaluate_candidate(
         elapsed = time.perf_counter() - start
         result["train_time_s"] = round(elapsed, 3)
 
-        # ── 8. Extract and store scores ───────────────────────────────────────
+# 8. Extract and store scores
         primary_key = f"test_{primary_metric}"
         cv_scores = cv_results[primary_key].tolist()
         result["cv_scores"] = cv_scores
@@ -263,9 +261,7 @@ def get_available_algorithms(
     return [algo["name"] for algo in config.get(task_type, [])]
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Internal helpers
-# ──────────────────────────────────────────────────────────────────────────────
 
 def _resolve_config_path(path: Optional[str | Path]) -> Path:
     """Find algorithms.yaml — search from file location upward."""

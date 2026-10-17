@@ -1,0 +1,143 @@
+{
+    "metadata": {
+        "description": "ModelPilot autonomous confidence-aware ML algorithm selection coordinator.",
+        "sample_queries": [
+            "Diagnose the iris dataset and recommend the best algorithms.",
+            "Evaluate top 3 models on the diabetes dataset.",
+            "Predict model performance for the wine dataset using historical meta-learning."
+        ]
+    },
+
+    include "backend/registries/llm_config.hocon"
+
+    "tools": [
+        {
+            "name": "ModelPilotCoordinator",
+            "function": {
+                "description": """You are ModelPilot, an autonomous agentic AI for confidence-aware ML algorithm selection and selective evaluation.
+                Your job is to assist users in:
+                1. Diagnosing dataset health, missingness, dimensionality, and class imbalance.
+                2. Recommending promising algorithms via heuristic rules and historical similarity.
+                3. Predicting candidate performance and uncertainty using cross-dataset meta-learning.
+                4. Selectively evaluating top candidates under cross-validation within the user's budget.
+                Always invoke tools to compute factual findings; never fabricate metrics."""
+            },
+            "instructions": """You are the ModelPilot coordinator. Use your registered tools to inspect data, recommend algorithms, and run evaluations:
+            - Use DatasetDiagnosticsTool to profile datasets.
+            - Use AlgorithmRecommendationTool to rank algorithms by heuristic rules and historical similarity.
+            - Use PerformancePredictionTool to predict expected validation metrics with confidence intervals before training.
+            - Use ModelEvaluationTool to run actual cross-validation evaluations on selected candidates.
+            Always present clear, objective summaries distinguishing heuristic advice from measured results.""",
+            "tools": [
+                "DatasetDiagnosticsTool",
+                "AlgorithmRecommendationTool",
+                "ModelEvaluationTool",
+                "PerformancePredictionTool"
+            ]
+        },
+        {
+            "name": "DatasetDiagnosticsTool",
+            "function": {
+                "description": "Diagnose dataset health, missingness, duplicate rows, constant features, and class imbalance.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "dataset_name": {
+                            "type": "string",
+                            "description": "Name of built-in dataset: 'iris', 'breast_cancer', 'wine', 'diabetes', 'california'."
+                        },
+                        "csv_path": {
+                            "type": "string",
+                            "description": "Path to CSV file if using a custom dataset."
+                        },
+                        "target_column": {
+                            "type": "string",
+                            "description": "Optional name of target column."
+                        }
+                    }
+                }
+            },
+            "class": "coded_tools.modelpilot.dataset_diagnostics_tool.DatasetDiagnosticsTool"
+        },
+        {
+            "name": "AlgorithmRecommendationTool",
+            "function": {
+                "description": "Recommend promising candidate algorithms using rule-based heuristics and historical dataset similarity.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "dataset_name": {
+                            "type": "string",
+                            "description": "Name of built-in dataset: 'iris', 'breast_cancer', 'wine', 'diabetes', 'california'."
+                        },
+                        "csv_path": {
+                            "type": "string",
+                            "description": "Path to custom CSV dataset."
+                        },
+                        "target_column": {
+                            "type": "string",
+                            "description": "Optional name of target column."
+                        }
+                    }
+                }
+            },
+            "class": "coded_tools.modelpilot.algorithm_recommendation_tool.AlgorithmRecommendationTool"
+        },
+        {
+            "name": "ModelEvaluationTool",
+            "function": {
+                "description": "Selectively train and cross-validate candidate algorithms on the dataset within budget and persist results.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "dataset_name": {
+                            "type": "string",
+                            "description": "Name of built-in dataset."
+                        },
+                        "csv_path": {
+                            "type": "string",
+                            "description": "Path to custom CSV dataset."
+                        },
+                        "target_column": {
+                            "type": "string",
+                            "description": "Optional name of target column."
+                        },
+                        "max_candidates": {
+                            "type": "integer",
+                            "description": "Maximum number of candidate models to evaluate (e.g. 3)."
+                        },
+                        "cv_folds": {
+                            "type": "integer",
+                            "description": "Number of cross-validation folds (default 5)."
+                        }
+                    }
+                }
+            },
+            "class": "coded_tools.modelpilot.model_evaluation_tool.ModelEvaluationTool"
+        },
+        {
+            "name": "PerformancePredictionTool",
+            "function": {
+                "description": "Predict validation performance, uncertainty intervals, and OOD detection using historical meta-learning.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "dataset_name": {
+                            "type": "string",
+                            "description": "Name of built-in dataset."
+                        },
+                        "csv_path": {
+                            "type": "string",
+                            "description": "Path to custom CSV dataset."
+                        },
+                        "target_column": {
+                            "type": "string",
+                            "description": "Optional name of target column."
+                        }
+                    }
+                }
+            },
+            "class": "coded_tools.modelpilot.performance_prediction_tool.PerformancePredictionTool"
+        }
+    ]
+}
