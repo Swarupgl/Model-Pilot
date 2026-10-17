@@ -8,6 +8,13 @@ ModelPilot investigates whether historical machine-learning experiments can pred
 
 ---
 
+## Hackathon Documentation
+
+- 🏛️ **[Architecture Description (`architecture.md`)](architecture.md)** — Detailed technical design, dual-engine topology, Neuro-SAN agent coordination, HOCON definitions, meta-learning math, and leak-free validation protocols.
+- 📋 **[Project Summary (`summary.md`)](summary.md)** — Executive summary, research hypothesis, quantitative benchmarks (compute reduction vs. accuracy), and conclusions.
+
+---
+
 ## Project Status
 
 | Phase | Description | Status |
@@ -69,28 +76,37 @@ ModelPilot/
 
 ---
 
-## Quick Start (PowerShell on Windows)
-
+## Quick Start
+ 
 ### 1. Environment Setup
-
+ 
+**Windows (PowerShell):**
 ```powershell
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
+**macOS / Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+ 
 ### 2. Configure Credentials
-
+ 
 Create `.env` in the project root:
 ```ini
 OPENROUTER_API_KEY=sk-or-v1-...
 OPENROUTER_API_BASE=https://openrouter.ai/api/v1
+MODEL_NAME=openai/gpt-4o-mini
 ```
-
+ 
 ### 3. Run Automated Tests (72 tests)
-
-```powershell
-python -m pytest tests/ -v
+ 
+```bash
+pytest tests/ -v
 ```
 
 ### 4. Run CLI Pipeline (Headless ML Engine)
