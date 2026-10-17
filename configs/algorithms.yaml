@@ -1,0 +1,127 @@
+# Algorithm registry configuration.
+# Defines which algorithms are available, their task types, and default hyperparameters.
+# ModelPilot reads this at startup — no code changes needed to add/remove algorithms.
+
+classification:
+  - name: DummyClassifier
+    module: sklearn.dummy
+    class: DummyClassifier
+    params:
+      strategy: most_frequent
+    tags: [baseline]
+
+  - name: LogisticRegression
+    module: sklearn.linear_model
+    class: LogisticRegression
+    params:
+      max_iter: 1000
+      random_state: 42
+    tags: [linear, fast]
+
+  - name: KNeighborsClassifier
+    module: sklearn.neighbors
+    class: KNeighborsClassifier
+    params:
+      n_neighbors: 5
+    tags: [instance_based, no_training]
+
+  - name: SVC
+    module: sklearn.svm
+    class: SVC
+    params:
+      random_state: 42
+    tags: [kernel, slow_on_large]
+
+  - name: DecisionTreeClassifier
+    module: sklearn.tree
+    class: DecisionTreeClassifier
+    params:
+      random_state: 42
+    tags: [tree, interpretable]
+
+  - name: RandomForestClassifier
+    module: sklearn.ensemble
+    class: RandomForestClassifier
+    params:
+      n_estimators: 100
+      random_state: 42
+    tags: [ensemble, robust]
+
+  - name: ExtraTreesClassifier
+    module: sklearn.ensemble
+    class: ExtraTreesClassifier
+    params:
+      n_estimators: 100
+      random_state: 42
+    tags: [ensemble, fast]
+
+  - name: GradientBoostingClassifier
+    module: sklearn.ensemble
+    class: GradientBoostingClassifier
+    params:
+      n_estimators: 100
+      random_state: 42
+    tags: [boosting, slow]
+
+  - name: GaussianNB
+    module: sklearn.naive_bayes
+    class: GaussianNB
+    params: {}
+    tags: [probabilistic, fast, assumes_independence]
+
+regression:
+  - name: DummyRegressor
+    module: sklearn.dummy
+    class: DummyRegressor
+    params:
+      strategy: mean
+    tags: [baseline]
+
+  - name: LinearRegression
+    module: sklearn.linear_model
+    class: LinearRegression
+    params: {}
+    tags: [linear, fast, interpretable]
+
+  - name: Ridge
+    module: sklearn.linear_model
+    class: Ridge
+    params:
+      alpha: 1.0
+    tags: [linear, regularized]
+
+  - name: KNeighborsRegressor
+    module: sklearn.neighbors
+    class: KNeighborsRegressor
+    params:
+      n_neighbors: 5
+    tags: [instance_based]
+
+  - name: SVR
+    module: sklearn.svm
+    class: SVR
+    params: {}
+    tags: [kernel, slow_on_large]
+
+  - name: DecisionTreeRegressor
+    module: sklearn.tree
+    class: DecisionTreeRegressor
+    params:
+      random_state: 42
+    tags: [tree, interpretable]
+
+  - name: RandomForestRegressor
+    module: sklearn.ensemble
+    class: RandomForestRegressor
+    params:
+      n_estimators: 100
+      random_state: 42
+    tags: [ensemble, robust]
+
+  - name: GradientBoostingRegressor
+    module: sklearn.ensemble
+    class: GradientBoostingRegressor
+    params:
+      n_estimators: 100
+      random_state: 42
+    tags: [boosting, slow]

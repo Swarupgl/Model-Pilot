@@ -1,0 +1,36 @@
+# Experiment protocol configuration.
+# Controls how ModelPilot evaluates models — change these without touching code.
+
+evaluation:
+  # Fraction of data held out as the final test set (never used during selection/tuning).
+  test_size: 0.2
+
+  # Number of cross-validation folds used during candidate selection.
+  cv_folds: 5
+
+  # Use stratified splits for classification tasks (preserves class proportions).
+  stratify_classification: true
+
+  # Global random seed — set once here to ensure reproducibility everywhere.
+  random_seed: 42
+
+budget:
+  # Maximum number of candidates to evaluate per run.
+  max_candidates: 5
+
+  # Maximum wall-clock seconds to spend evaluating a single candidate.
+  # 0 means no timeout.
+  candidate_timeout_seconds: 120
+
+output:
+  # Root directory for all experiment outputs.
+  output_dir: outputs
+
+  # Sub-directory for JSON experiment records.
+  experiments_dir: outputs/experiments
+
+  # Sub-directory for generated reports.
+  reports_dir: outputs/reports
+
+  # Print detailed progress to the console.
+  verbose: true
