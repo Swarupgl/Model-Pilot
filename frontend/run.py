@@ -16,9 +16,10 @@ _frontend_dir = os.path.dirname(os.path.abspath(__file__))
 _project_root = os.path.dirname(_frontend_dir)
 _backend_dir = os.path.join(_project_root, "backend")
 _src_dir = os.path.join(_project_root, "src")
+_venv_site = os.path.join(_project_root, ".venv", "Lib", "site-packages")
 
-for p in [_project_root, _backend_dir, _src_dir]:
-    if p not in sys.path:
+for p in [_venv_site, _project_root, _backend_dir, _src_dir]:
+    if os.path.exists(p) and p not in sys.path:
         sys.path.insert(0, p)
 
 from modelpilot.data.loader import load_builtin, load_csv

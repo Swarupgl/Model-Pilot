@@ -11,23 +11,21 @@ load_dotenv()
 _backend_dir = os.path.dirname(os.path.abspath(__file__))
 _project_root = os.path.dirname(_backend_dir)
 _src_dir = os.path.join(_project_root, "src")
+_venv_site = os.path.join(_project_root, ".venv", "Lib", "site-packages")
 
-# Configure Neuro-SAN environment variables
-os.environ["AGENT_MANIFEST_FILE"] = os.path.join(_backend_dir, "registries", "manifest.hocon")
-os.environ["AGENT_TOOL_PATH"] = os.path.join(_backend_dir, "coded_tools")
+# Ensure site-packages, backend, and src directories are in sys.path and PYTHONPATH
+for p in [_venv_site, _project_root, _backend_dir, _src_dir]:
+    if os.path.exists(p) and p not in sys.path:
+        sys.path.insert(0, p)
 
-# Ensure backend and src directories are in PYTHONPATH
 _existing_pythonpath = os.environ.get("PYTHONPATH", "")
-paths_to_add = [_backend_dir, _src_dir]
+paths_to_add = [_venv_site, _backend_dir, _src_dir]
 for p in paths_to_add:
     if p not in _existing_pythonpath.split(os.pathsep):
         _existing_pythonpath = f"{p}{os.pathsep}{_existing_pythonpath}" if _existing_pythonpath else p
-os.environ["PYTHONPATH"] = _existing_pythonpath
-
-if _src_dir not in sys.path:
-    sys.path.insert(0, _src_dir)
-if _backend_dir not in sys.path:
-    sys.path.insert(0, _backend_dir)
+# Configure Neuro-SAN environment variables
+os.environ["AGENT_MANIFEST_FILE"] = os.path.join(_backend_dir, "registries", "manifest.hocon")
+os.environ["AGENT_TOOL_PATH"] = os.path.join(_backend_dir, "coded_tools")
 
 from neuro_san.client.agent_session_factory import DirectAgentSessionFactory
 
