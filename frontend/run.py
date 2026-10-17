@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 _frontend_dir = os.path.dirname(os.path.abspath(__file__))
 _project_root = os.path.dirname(_frontend_dir)
@@ -262,28 +263,40 @@ with tab_agent:
     st.caption("Powered by Cognizant Neuro-SAN and OpenRouter (`openai/gpt-4o-mini`)")
 
     with st.expander("🔍 Neuro-SAN Multi-Agent Topology & Tool Architecture", expanded=True):
-        st.markdown("""
-```mermaid
-graph TD
-    User["👤 User / Streamlit Interface"] --> Coordinator["🧠 ModelPilotCoordinator<br/>(Cognizant Neuro-SAN Agent)"]
-    Coordinator --> Tool1["🔬 DatasetDiagnosticsTool<br/>(Coded Tool)"]
-    Coordinator --> Tool2["💡 AlgorithmRecommendationTool<br/>(Coded Tool)"]
-    Coordinator --> Tool3["📊 PerformancePredictionTool<br/>(Coded Tool)"]
-    Coordinator --> Tool4["⚙️ ModelEvaluationTool<br/>(Coded Tool)"]
-    
-    Tool1 -.-> Output1["Dataset Health, Multicollinearity, Class Imbalance"]
-    Tool2 -.-> Output2["Heuristic & Historical Similarity Recommendations"]
-    Tool3 -.-> Output3["Cross-Dataset Prediction & Uncertainty Bounds"]
-    Tool4 -.-> Output4["Leakage-Free Cross-Validation & SQLite Store"]
+        st.link_button(
+            "🌐 Open Official Cognizant Neuro-SAN Studio (Live Cloud UI)",
+            "https://neuro-san.evolution.ml/",
+            help="Cognizant's hosted cloud playground for Neuro-SAN agent networks (BYOK: Bring Your Own Key).",
+        )
 
-    classDef agent fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
-    classDef tool fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#b45309;
-    classDef output fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,color:#334155;
-    class Coordinator agent;
-    class Tool1,Tool2,Tool3,Tool4 tool;
-    class Output1,Output2,Output3,Output4 output;
-```
-""")
+        mermaid_html = """
+        <div class="mermaid" style="display:flex; justify-content:center; align-items:center; background:#f8fafc; border-radius:8px; padding:12px;">
+        graph TD
+            User["👤 User / Streamlit Interface"] --> Coordinator["🧠 ModelPilotCoordinator<br/>(Cognizant Neuro-SAN Agent)"]
+            Coordinator --> Tool1["🔬 DatasetDiagnosticsTool<br/>(Health & Leakage Profiler)"]
+            Coordinator --> Tool2["💡 AlgorithmRecommendationTool<br/>(Heuristic & Historical Selector)"]
+            Coordinator --> Tool3["📊 PerformancePredictionTool<br/>(Meta-Predictor ±1.96σ)"]
+            Coordinator --> Tool4["⚙️ ModelEvaluationTool<br/>(Leak-Free Cross-Validation)"]
+            
+            Tool1 -.-> Output1["Dataset Health & Collinearity"]
+            Tool2 -.-> Output2["Heuristic & Historical Rankings"]
+            Tool3 -.-> Output3["Predicted Metrics & Uncertainty"]
+            Tool4 -.-> Output4["Validation Scores & SQLite Store"]
+
+            classDef agent fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+            classDef tool fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#b45309;
+            classDef output fill:#f1f5f9,stroke:#94a3b8,stroke-width:1px,color:#334155;
+            class Coordinator agent;
+            class Tool1,Tool2,Tool3,Tool4 tool;
+            class Output1,Output2,Output3,Output4 output;
+        </div>
+        <script type="module">
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+        </script>
+        """
+        components.html(mermaid_html, height=360)
+
         col_t1, col_t2, col_t3, col_t4 = st.columns(4)
         col_t1.success("🔬 **Diagnostics Tool**: Active")
         col_t2.success("💡 **Recommendation Tool**: Active")
