@@ -260,6 +260,35 @@ with tab_agent:
     st.subheader("Autonomous Neuro-SAN Multi-Agent Coordinator")
     st.caption("Powered by Cognizant Neuro-SAN and OpenRouter (`openai/gpt-4o-mini`)")
 
+    with st.expander("🔍 Neuro-SAN Multi-Agent Topology & Tool Architecture", expanded=True):
+        st.markdown("""
+```mermaid
+graph TD
+    User["👤 User / Streamlit Interface"] --> Coordinator["🧠 ModelPilotCoordinator<br/>(Cognizant Neuro-SAN Agent)"]
+    Coordinator --> Tool1["🔬 DatasetDiagnosticsTool<br/>(Coded Tool)"]
+    Coordinator --> Tool2["💡 AlgorithmRecommendationTool<br/>(Coded Tool)"]
+    Coordinator --> Tool3["📊 PerformancePredictionTool<br/>(Coded Tool)"]
+    Coordinator --> Tool4["⚙️ ModelEvaluationTool<br/>(Coded Tool)"]
+    
+    Tool1 -.-> Output1["Dataset Health, Multicollinearity, Class Imbalance"]
+    Tool2 -.-> Output2["Heuristic & Historical Similarity Recommendations"]
+    Tool3 -.-> Output3["Cross-Dataset Prediction & Uncertainty Bounds"]
+    Tool4 -.-> Output4["Leakage-Free Cross-Validation & SQLite Store"]
+
+    classDef agent fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef tool fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#b45309;
+    classDef output fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,color:#334155;
+    class Coordinator agent;
+    class Tool1,Tool2,Tool3,Tool4 tool;
+    class Output1,Output2,Output3,Output4 output;
+```
+""")
+        col_t1, col_t2, col_t3, col_t4 = st.columns(4)
+        col_t1.success("🔬 **Diagnostics Tool**: Active")
+        col_t2.success("💡 **Recommendation Tool**: Active")
+        col_t3.success("📊 **Meta-Predictor Tool**: Active")
+        col_t4.success("⚙️ **Evaluator Tool**: Active")
+
     # Render previous conversation
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
