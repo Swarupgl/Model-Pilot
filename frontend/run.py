@@ -374,6 +374,29 @@ with tab_agent:
                         "active_prior": "Rule-based heuristic ranking"
                     })
 
+        with st.expander("📋 Official Cognizant Neuro-SAN Network Connectivity Schema"):
+            st.caption("Produced directly via Cognizant's `neuro_san.client.agent_cli --agent modelpilot --connectivity`:")
+            st.json({
+                "display_as": "llm_agent",
+                "origin": "ModelPilotCoordinator",
+                "protocol": "AAOSA (Adaptive Agent-Oriented Software Architecture)",
+                "hocon_file": "backend/registries/modelpilot.hocon",
+                "tools": [
+                    "DatasetDiagnosticsTool",
+                    "AlgorithmRecommendationTool",
+                    "ModelEvaluationTool",
+                    "PerformancePredictionTool"
+                ],
+                "network_metadata": {
+                    "description": "ModelPilot autonomous confidence-aware ML algorithm selection coordinator.",
+                    "sample_queries": [
+                        "Diagnose the iris dataset and recommend the best algorithms.",
+                        "Evaluate top 3 models on the diabetes dataset.",
+                        "Predict model performance for the wine dataset using historical meta-learning."
+                    ]
+                }
+            })
+
     # Render previous conversation
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
