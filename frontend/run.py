@@ -379,7 +379,7 @@ with tab_agent:
                     user_text=user_query,
                     chat_context=st.session_state.chat_context,
                 )
-
+                if "response" in response and "text" in response["response"]:
                     ans_text = response["response"]["text"]
                     st.markdown(ans_text)
                     with st.expander("⚡ View Neuro-SAN Backend Execution Trace & AAOSA Protocol"):
