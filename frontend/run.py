@@ -107,6 +107,22 @@ if "last_eval_results" not in st.session_state:
 diag = diagnose_dataset(df, target_column=target_col, task_type=task_type_override)
 meta = extract_meta_features(df, target_column=target_col, task_type=task_type_override)
 store = ExperimentStore()
+fingerprint = meta.get("dataset_fingerprint", "unknown_fingerprint")
+heuristic_ranks = rank_algorithms_heuristic(task_type_override, diag)
+
+# Meta-learning performance predictor
+historical_records = store.get_meta_dataset(task_type=task_type_override)
+has_history = len(historical_records) >= 3
+if has_history:
+    try:
+        predictor = PerformancePredictor()
+        predictor.fit(historical_records)
+        preds = predictor.predict(meta)
+    except Exception:
+        preds = None
+        has_history = False
+else:
+    preds = None
 
 # ── Main Tabs ────────────────────────────────────────────────────────────────
 tab_diag, tab_meta, tab_eval, tab_agent, tab_history = st.tabs([
@@ -148,21 +164,14 @@ with tab_meta:
     st.subheader("Predictive Meta-Learning & Candidate Recommendations")
     st.caption(f"Dataset Fingerprint: `{meta['dataset_fingerprint']}` | Meta-Extractor Version: `{meta['extractor_version']}`")
 
-    # Meta-learning performance predictor
-    historical_records = store.get_meta_dataset(task_type=task_type_override)
-    has_history = len(historical_records) >= 3
-
     col_meta1, col_meta2 = st.columns([3, 2])
 
     with col_meta1:
         st.markdown("#### Predicted Algorithm Performance (Before Training)")
-        if has_history:
-            predictor = PerformancePredictor()
-            predictor.fit(historical_records)
-            preds = predictor.predict(meta)
+        if preds is not None:
             pred_df = pd.DataFrame(preds)
 
-            if preds[0]["is_out_of_distribution"]:
+            if preds and preds[0].get("is_out_of_distribution"):
                 st.error("⚠️ Out-of-Distribution Warning: This dataset is significantly distant from historical training benchmarks. Uncertainty is elevated.")
 
             # Display predictions table
@@ -170,7 +179,6 @@ with tab_meta:
             st.dataframe(pred_df[display_cols], use_container_width=True)
         else:
             st.info("ℹ️ Fewer than 3 historical benchmark runs available in local store. Displaying transparent rule-based heuristics.")
-            heuristic_ranks = rank_algorithms_heuristic(task_type_override, diag)
             h_df = pd.DataFrame(heuristic_ranks)
             st.dataframe(h_df[["algorithm", "heuristic_score", "tags", "rationale"]], use_container_width=True)
 
@@ -354,10 +362,17 @@ with tab_agent:
                 st.json(diag)
             if c_btn2.button("💡 Inspect Recommendation Tool Output", key="btn_inspect_rec"):
                 st.write("**AlgorithmRecommendationTool Output (JSON):**")
-                st.json({"dataset_task": task_type, "heuristic_rankings": heuristic_ranks[:5]})
+                st.json({"dataset_task": task_type_override, "heuristic_rankings": heuristic_ranks[:5]})
             if c_btn3.button("📊 Inspect Meta-Predictor Output", key="btn_inspect_pred"):
                 st.write("**PerformancePredictionTool Output (JSON):**")
-                st.json({"dataset_fingerprint": fingerprint[:16] + "...", "predictions_with_bounds": preds})
+                if preds is not None:
+                    st.json({"dataset_fingerprint": fingerprint[:16] + "...", "predictions_with_bounds": preds})
+                else:
+                    st.json({
+                        "dataset_fingerprint": fingerprint[:16] + "...",
+                        "status": "Awaiting >=3 historical benchmark runs in SQLite store",
+                        "active_prior": "Rule-based heuristic ranking"
+                    })
 
     # Render previous conversation
     for msg in st.session_state.chat_messages:
