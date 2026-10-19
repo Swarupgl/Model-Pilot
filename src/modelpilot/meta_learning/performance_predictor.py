@@ -87,7 +87,8 @@ class PerformancePredictor:
                 for j in range(i + 1, len(self.train_meta_vectors_)):
                     dists.append(np.linalg.norm(self.train_meta_vectors_[i] - self.train_meta_vectors_[j]))
             if dists:
-                self.ood_distance_threshold_ = float(np.percentile(dists, 95)) * 1.5
+                p95 = float(np.percentile(dists, 95))
+                self.ood_distance_threshold_ = max(p95 * 1.5, 2.5) if p95 > 0.1 else 2.5
 
         self.model = RandomForestRegressor(
             n_estimators=50,
@@ -156,7 +157,8 @@ class PerformancePredictor:
                 ci_upper = min(1.0, pred_score + 0.5)
 
             # Confidence level reflects distance & ensemble agreement
-            uncertainty_penalty = min(1.0, (min_distance / self.ood_distance_threshold_) * 0.4)
+            threshold = max(self.ood_distance_threshold_, 1e-4)
+            uncertainty_penalty = min(1.0, (min_distance / threshold) * 0.4)
             confidence = max(0.0, round(float(1.0 - pred_std - uncertainty_penalty), 3))
 
             results.append({
