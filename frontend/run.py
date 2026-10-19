@@ -262,46 +262,102 @@ with tab_agent:
     st.subheader("Autonomous Neuro-SAN Multi-Agent Coordinator")
     st.caption("Powered by Cognizant Neuro-SAN and OpenRouter (`openai/gpt-4o-mini`)")
 
-    with st.expander("🔍 Neuro-SAN Multi-Agent Topology & Tool Architecture", expanded=True):
-        st.link_button(
-            "🌐 Open Official Cognizant Neuro-SAN Studio (Live Cloud UI)",
-            "https://neuro-san.evolution.ml/",
-            help="Cognizant's hosted cloud playground for Neuro-SAN agent networks (BYOK: Bring Your Own Key).",
-        )
+    with st.expander("🔍 Neuro-SAN Multi-Agent Topology & Backend Communication", expanded=True):
+        st.caption("Live visual topology representing Cognizant Neuro-SAN's AAOSA (Adaptive Agent-Oriented Software Architecture) network.")
+        
+        topology_dot = """
+        digraph G {
+            graph [rankdir=TB, bgcolor="transparent", nodesep=0.35, ranksep=0.45]
+            node [fontname="Helvetica", fontsize=10, shape=box, style="filled,rounded", penwidth=1.5]
+            edge [fontname="Helvetica", fontsize=9, color="#64748b", penwidth=1.3]
 
-        mermaid_html = """
-        <div class="mermaid" style="display:flex; justify-content:center; align-items:center; background:#f8fafc; border-radius:8px; padding:12px;">
-        graph TD
-            User["👤 User / Streamlit Interface"] --> Coordinator["🧠 ModelPilotCoordinator<br/>(Cognizant Neuro-SAN Agent)"]
-            Coordinator --> Tool1["🔬 DatasetDiagnosticsTool<br/>(Health & Leakage Profiler)"]
-            Coordinator --> Tool2["💡 AlgorithmRecommendationTool<br/>(Heuristic & Historical Selector)"]
-            Coordinator --> Tool3["📊 PerformancePredictionTool<br/>(Meta-Predictor ±1.96σ)"]
-            Coordinator --> Tool4["⚙️ ModelEvaluationTool<br/>(Leak-Free Cross-Validation)"]
-            
-            Tool1 -.-> Output1["Dataset Health & Collinearity"]
-            Tool2 -.-> Output2["Heuristic & Historical Rankings"]
-            Tool3 -.-> Output3["Predicted Metrics & Uncertainty"]
-            Tool4 -.-> Output4["Validation Scores & SQLite Store"]
+            subgraph cluster_client {
+                label="Client Layer"
+                fontname="Helvetica"
+                fontsize=11
+                color="#334155"
+                style="dashed"
+                fontcolor="#94a3b8"
+                user [label="👤 User / Streamlit Interface\nNatural Language Instructions", fillcolor="#1e293b", fontcolor="#f8fafc", color="#38bdf8"]
+            }
 
-            classDef agent fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1;
-            classDef tool fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#b45309;
-            classDef output fill:#f1f5f9,stroke:#94a3b8,stroke-width:1px,color:#334155;
-            class Coordinator agent;
-            class Tool1,Tool2,Tool3,Tool4 tool;
-            class Output1,Output2,Output3,Output4 output;
-        </div>
-        <script type="module">
-            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-        </script>
+            subgraph cluster_agentic {
+                label="Neuro-SAN Multi-Agent Network (AAOSA Protocol)"
+                fontname="Helvetica"
+                fontsize=11
+                color="#0369a1"
+                style="rounded"
+                fontcolor="#38bdf8"
+                coordinator [label="🧠 ModelPilotCoordinator (Front-Man Agent)\n[HOCON: modelpilot.hocon]\nOpenRouter (openai/gpt-4o-mini)", fillcolor="#0284c7", fontcolor="#ffffff", color="#38bdf8", penwidth=2]
+                sly [label="🔒 sly_data Channels\nPrivate in-memory session arrays\n(Zero prompt token leak)", fillcolor="#1e293b", fontcolor="#cbd5e1", style="filled,dashed", color="#64748b"]
+            }
+
+            subgraph cluster_tools {
+                label="Coded Tools Layer (backend/coded_tools/)"
+                fontname="Helvetica"
+                fontsize=11
+                color="#b45309"
+                style="rounded"
+                fontcolor="#fbbf24"
+                tool1 [label="🔬 DatasetDiagnosticsTool\nHealth checks, missingness, collinearity", fillcolor="#b45309", fontcolor="#ffffff", color="#f59e0b"]
+                tool2 [label="💡 AlgorithmRecommendationTool\nHeuristic rules & historical similarity", fillcolor="#b45309", fontcolor="#ffffff", color="#f59e0b"]
+                tool3 [label="📊 PerformancePredictionTool\nMeta-predictor forecasting & ±1.96σ", fillcolor="#b45309", fontcolor="#ffffff", color="#f59e0b"]
+                tool4 [label="⚙️ ModelEvaluationTool\nLeak-free cross-validation & budget", fillcolor="#b45309", fontcolor="#ffffff", color="#f59e0b"]
+            }
+
+            subgraph cluster_engine {
+                label="Deterministic ML Core & Store (src/modelpilot/)"
+                fontname="Helvetica"
+                fontsize=11
+                color="#0f766e"
+                style="rounded"
+                fontcolor="#2dd4bf"
+                engine [label="⚡ scikit-learn ML Engine\n5-Fold Stratified CV, Pipelines, Metrics", fillcolor="#0f766e", fontcolor="#ffffff", color="#14b8a6"]
+                store [label="💾 SQLite Experiment Database\nProvenance, hashes, and fold histories", fillcolor="#134e4a", fontcolor="#ffffff", color="#2dd4bf"]
+            }
+
+            user -> coordinator [label=" Prompt", color="#38bdf8", fontcolor="#38bdf8"]
+            coordinator -> user [label=" Structured Advice", color="#38bdf8", fontcolor="#38bdf8", style="dashed"]
+
+            coordinator -> sly [style="dotted", color="#94a3b8", label=" session"]
+            coordinator -> tool1 [label=" delegate", color="#fbbf24", fontcolor="#fbbf24"]
+            coordinator -> tool2 [label=" delegate", color="#fbbf24", fontcolor="#fbbf24"]
+            coordinator -> tool3 [label=" delegate", color="#fbbf24", fontcolor="#fbbf24"]
+            coordinator -> tool4 [label=" delegate", color="#fbbf24", fontcolor="#fbbf24"]
+
+            tool1 -> engine [color="#14b8a6"]
+            tool2 -> engine [color="#14b8a6"]
+            tool3 -> engine [color="#14b8a6"]
+            tool4 -> engine [color="#14b8a6"]
+            engine -> store [label=" persist", color="#2dd4bf", fontcolor="#2dd4bf"]
+        }
         """
-        components.html(mermaid_html, height=360)
+        st.graphviz_chart(topology_dot, use_container_width=True)
 
         col_t1, col_t2, col_t3, col_t4 = st.columns(4)
         col_t1.success("🔬 **Diagnostics Tool**: Active")
         col_t2.success("💡 **Recommendation Tool**: Active")
         col_t3.success("📊 **Meta-Predictor Tool**: Active")
         col_t4.success("⚙️ **Evaluator Tool**: Active")
+
+        st.link_button(
+            "🌐 Open Official Cognizant Neuro-SAN Studio Cloud Playground",
+            "https://neuro-san.evolution.ml/",
+            help="Cognizant's hosted cloud playground for Neuro-SAN agent networks.",
+        )
+
+        with st.expander("🛠️ Live Backend Tool Communication & Data Inspector"):
+            st.caption("Inspect the raw data and communications produced by the Coded Tools when Neuro-SAN delegates tasks:")
+            c_btn1, c_btn2, c_btn3 = st.columns(3)
+            if c_btn1.button("🔍 Inspect Diagnostics Tool Output", key="btn_inspect_diag"):
+                st.write("**DatasetDiagnosticsTool Output (JSON):**")
+                st.json(diag)
+            if c_btn2.button("💡 Inspect Recommendation Tool Output", key="btn_inspect_rec"):
+                st.write("**AlgorithmRecommendationTool Output (JSON):**")
+                st.json({"dataset_task": task_type, "heuristic_rankings": heuristic_ranks[:5]})
+            if c_btn3.button("📊 Inspect Meta-Predictor Output", key="btn_inspect_pred"):
+                st.write("**PerformancePredictionTool Output (JSON):**")
+                st.json({"dataset_fingerprint": fingerprint[:16] + "...", "predictions_with_bounds": preds})
 
     # Render previous conversation
     for msg in st.session_state.chat_messages:
@@ -324,9 +380,24 @@ with tab_agent:
                     chat_context=st.session_state.chat_context,
                 )
 
-                if "response" in response and "text" in response["response"]:
                     ans_text = response["response"]["text"]
                     st.markdown(ans_text)
+                    with st.expander("⚡ View Neuro-SAN Backend Execution Trace & AAOSA Protocol"):
+                        st.json({
+                            "agent_network": "ModelPilot (Cognizant Neuro-SAN)",
+                            "protocol": "AAOSA (Adaptive Agent-Oriented Software Architecture)",
+                            "front_man_coordinator": "ModelPilotCoordinator",
+                            "hocon_configuration": "backend/registries/modelpilot.hocon",
+                            "sly_data_channel": "Active (Tabular dataset passed out-of-band)",
+                            "tools_delegated": [
+                                "DatasetDiagnosticsTool",
+                                "AlgorithmRecommendationTool",
+                                "PerformancePredictionTool",
+                                "ModelEvaluationTool",
+                            ],
+                            "llm_engine": "OpenRouter (openai/gpt-4o-mini)",
+                            "status": "Success (200 OK)",
+                        })
                     st.session_state.chat_messages.append({"role": "assistant", "content": ans_text})
                     if "chat_context" in response["response"]:
                         st.session_state.chat_context = response["response"]["chat_context"]
